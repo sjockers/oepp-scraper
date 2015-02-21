@@ -1,0 +1,16 @@
+{
+  "name": "oepp-scraper",
+  "version": "0.0.0",
+  "description": "Very basic scraper for extracting data from ppp-projektdatenbank.de",
+  "main": "oepp-scraper.js",
+  "dependencies": {
+    "fs": "~0.0.2",
+    "scraperjs": "^0.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Simon Jockers",
+  "license": "public domain"
+}
