@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var CLOSING_DATE = 'Vertragsabschluss (MM.JJJJ)';
+var TENDERING_DATE = 'Bekanntmachung der Ausschreibung (MM.JJJJ)';
 var PHASE_3 = 'Phase 3 - Projekt mit Vertragsabschluss';
 var PHASE_3A = 'Phase 3a - Projekt mit Vertragsabschluss ohne Endfinanzierung';
 
@@ -18,8 +19,12 @@ dateUtils = {
       var data3 = item.data[PHASE_3] || {};
       var data3a = item.data[PHASE_3A] || {};
       var closingDate = data3[CLOSING_DATE] || data3a[CLOSING_DATE];
+      var tenderingDate = data3[TENDERING_DATE] || data3a[TENDERING_DATE];
       if (closingDate) {
         item[CLOSING_DATE] = dateUtils.toIsoDate(closingDate);
+      }
+      if (tenderingDate) {
+        item[TENDERING_DATE] = dateUtils.toIsoDate(tenderingDate);
       }
       return item;
     });
