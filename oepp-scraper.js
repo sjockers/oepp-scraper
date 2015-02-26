@@ -58,9 +58,9 @@ function scrapeProjectDetailsPage(url) {
   var detailsScraper = scraperjs.StaticScraper.create(url);
   return detailsScraper.scrape(function($) {
     return {
-      title: $("#content h2").text(),
-      description: $("#content .description").text(),
-      source: url,
+      "Projektüberschrift": $("#content h2").text().replace('Projektüberschrift: ', ''),
+      "Beschreibung": $("#content .description").text(),
+      src: url,
       data: parseTables($)
     };
   });
