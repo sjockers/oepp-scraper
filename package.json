@@ -4,7 +4,6 @@
   "description": "Very basic scraper for extracting data from ppp-projektdatenbank.de",
   "main": "oepp-scraper.js",
   "dependencies": {
-    "fs": "~0.0.2",
     "scraperjs": "^0.3.3",
     "q": "^1.2.0"
   },

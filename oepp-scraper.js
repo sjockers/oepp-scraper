@@ -29,9 +29,10 @@ function iterate(step) {
 }
 
 function writeOutput() {
-  console.log('---\nWriting ', output.length, ' items.\n---')
-  var outputStream = fs.createWriteStream('data.json', { encoding: "utf8" });
-  outputStream.write(JSON.stringify(output, null, 2));
+  console.log('---\nWriting ', output.length, ' items.\n---');
+  var file = fs.createWriteStream('data.json', { encoding: "utf8" });
+  file.write(JSON.stringify(output, null, 2));
+  file.end();
 }
 
 function scrapeProjectIndexPage(url) {
