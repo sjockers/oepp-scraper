@@ -3,6 +3,8 @@
 var scraperjs = require('scraperjs');
 var fs = require('fs');
 var Q = require('q');
+var investmentVolumeUtils = require('./utils/investment_volume.js');
+var flatten = require('./utils/flatten.js');
 
 var BASE_URL = 'http://www.ppp-projektdatenbank.de/index.php?id=9&tx_ppp_controller_searchmap[sector]=&tx_ppp_controller_searchmap[subsector]=&tx_ppp_controller_searchmap[state]=&tx_ppp_controller_searchmap[county]=&tx_ppp_controller_searchmap[action][showList]=Suchen&tx_ppp_controller_searchmap[offset]=';
 var ITEMS_PER_PAGE = 15;
@@ -30,6 +32,7 @@ function iterate(step) {
 
 function writeOutput() {
   console.log('---\nWriting ', output.length, ' items.\n---');
+  output = flatten(output);
   var file = fs.createWriteStream('data.json', { encoding: "utf8" });
   file.write(JSON.stringify(output, null, 2));
   file.end();
