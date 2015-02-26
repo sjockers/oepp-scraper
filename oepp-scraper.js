@@ -4,22 +4,37 @@ var scraperjs = require('scraperjs');
 var fs = require('fs');
 var Q = require('q');
 
-var baseUrl = 'http://www.ppp-projektdatenbank.de/index.php?id=9&tx_ppp_controller_searchmap[sector]=&tx_ppp_controller_searchmap[subsector]=&tx_ppp_controller_searchmap[state]=&tx_ppp_controller_searchmap[county]=&tx_ppp_controller_searchmap[action][showList]=Suchen&tx_ppp_controller_searchmap[offset]=';
-var out = fs.createWriteStream('data.json', { encoding: "utf8" });
+var BASE_URL = 'http://www.ppp-projektdatenbank.de/index.php?id=9&tx_ppp_controller_searchmap[sector]=&tx_ppp_controller_searchmap[subsector]=&tx_ppp_controller_searchmap[state]=&tx_ppp_controller_searchmap[county]=&tx_ppp_controller_searchmap[action][showList]=Suchen&tx_ppp_controller_searchmap[offset]=';
+var ITEMS_PER_PAGE = 15;
+var output = [];
 
-for (i = 0; i < 1; i++) {
-  var offset = i * 15;
-  var indexUrl = baseUrl + offset;
+iterate(0);
+
+function iterate(step) {
+  var offset = ITEMS_PER_PAGE * step;
+  var indexUrl = BASE_URL + offset;
   var scraper = scrapeProjectIndexPage(indexUrl);
 
   scraper.then(function(data) {
-    data.lastReturn.then(function(sets) {
-      console.log(sets);
+    data.lastReturn.then(function(datasets) {
+      if (datasets.length > 0) {
+        output = output.concat(datasets);
+        iterate(++step);
+      }
+      else {
+        writeOutput();
+      }
     });
   });
 }
 
-function scrapeProjectIndexPage (url) {
+function writeOutput() {
+  console.log('---\nWriting ', output.length, ' items.\n---')
+  var outputStream = fs.createWriteStream('data.json', { encoding: "utf8" });
+  outputStream.write(JSON.stringify(output, null, 2));
+}
+
+function scrapeProjectIndexPage(url) {
   var indexScraper = scraperjs.StaticScraper.create(url);
   return indexScraper.scrape(function($) {
     var details = $("#list td a").map(function() {
@@ -34,19 +49,30 @@ function scrapeProjectIndexPage (url) {
   });
 }
 
-function scrapeProjectDetailsPage (url) {
+function scrapeProjectDetailsPage(url) {
+  console.log('scraping... ', url);
   var detailsScraper = scraperjs.StaticScraper.create(url);
   return detailsScraper.scrape(function($) {
     return {
       title: $("#content h2").text(),
+      description: $("#content .description").text(),
       source: url,
-      meta: extractMetaData($)
+      data: parseTables($)
     };
   });
 }
 
-function extractMetaData ($) {
-  var input = $('h3:contains("Projektstammdaten") + table td.label');
+function parseTables($) {
+  var tableData = {};
+  $("#content h3").each(function() {
+    var tableTitle = $(this).text().trim();
+    tableData[tableTitle] = extractTableData($, tableTitle);
+  });
+  return tableData;
+}
+
+function extractTableData($, tableTitle) {
+  var input = $('h3:contains("' + tableTitle + '") + table td.label');
   var output = {};
   input.each(function() {
     var key = $(this).text().trim();
