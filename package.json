@@ -6,7 +6,8 @@
   "dependencies": {
     "scraperjs": "^0.3.3",
     "q": "^1.2.0",
-    "lodash": "^3.3.1"
+    "lodash": "^3.3.1",
+    "nice-json2csv": "^0.2.0"
   },
   "devDependencies": {},
   "scripts": {

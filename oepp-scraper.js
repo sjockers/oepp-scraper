@@ -3,6 +3,8 @@
 var scraperjs = require('scraperjs');
 var fs = require('fs');
 var Q = require('q');
+var json2csv = require('nice-json2csv')
+
 var investmentVolumeUtils = require('./utils/investment_volume.js');
 var flatten = require('./utils/flatten.js');
 
@@ -24,19 +26,26 @@ function iterate(step) {
         iterate(++step);
       }
       else {
-        writeOutput();
+        var processedOutput = flatten(output);
+        writeOutputToJSON(processedOutput);
+        writeOutputToCSV(processedOutput);
       }
     });
   });
 }
 
-function writeOutput() {
-  console.log('---\nWriting ', output.length, ' items.\n---');
-  output = flatten(output);
+function writeOutputToJSON(data) {
+  console.log('---\nWriting', data.length, 'items to JSON.');
   var file = fs.createWriteStream('data.json', { encoding: "utf8" });
-  file.write(JSON.stringify(output, null, 2));
+  file.write(JSON.stringify(data, null, 2));
   file.end();
 }
+
+function writeOutputToCSV(data) {
+  console.log('---\nWriting', data.length, 'items to CSV.');
+  var file = fs.createWriteStream('data.csv', { encoding: "utf8" });
+  file.write(json2csv.convert(data));
+  file.end();}
 
 function scrapeProjectIndexPage(url) {
   var indexScraper = scraperjs.StaticScraper.create(url);
